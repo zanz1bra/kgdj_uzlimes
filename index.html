@@ -181,20 +181,27 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  const API_URL = '/.netlify/functions/points'; // Netlify function, ko uztaisīsim
+  // Supabase configuration
+  const SUPABASE_URL = 'https://vshfjwueojruorxkltyu.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_has7Gz7VgorBjFV9PAH2jQ_F7caqPav';
+  
+  const { createClient } = window.supabase;
+  const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
   let map;
   let markers = new Map(); // id -> marker
   let addMode = false;
 
   async function fetchPoints(){
     try{
-      const res = await fetch(API_URL);
-      if(!res.ok) throw new Error('API error');
-      const data = await res.json();
-      renderPoints(data);
-      document.getElementById('conn-badge').textContent = 'Savienots ar GitHub';
+      const { data, error } = await supabase.from('points').select('*');
+      if(error) throw error;
+      renderPoints(data || []);
+      document.getElementById('conn-badge').textContent = 'Savienots ✓';
     }catch(e){
+      console.error('Error fetching points:', e);
       document.getElementById('conn-badge').textContent = 'Savienojums neizdevās';
     }
   }
@@ -221,7 +228,7 @@
           <label for="seen-${p.id}">Redzēts dzīvē</label>
         </div>
         <button class="btn-pop btn-save" onclick="savePoint('${p.id}')">Saglabāt</button>
-        <button class="btn-pop btn-seen-toggle" onclick="toggleSeen('${p.id}')">Pārslēgt “redzēts”</button>
+        <button class="btn-pop btn-seen-toggle" onclick="toggleSeen('${p.id}')">Pārslēgt "redzēts"</button>
         <button class="btn-pop btn-delete" onclick="deletePoint('${p.id}')">Dzēst punktu</button>
       </div>
     `;
@@ -235,11 +242,12 @@
     const marker = markers.get(id);
     const {lat, lng} = marker.getLatLng();
 
-    await fetch(API_URL, {
-      method:'PUT',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({id, lat, lng, name, note, seen})
-    });
+    const { error } = await supabase
+      .from('points')
+      .update({ lat, lng, name, note, seen })
+      .eq('id', id);
+    
+    if(error) console.error('Error updating point:', error);
     await fetchPoints();
   }
 
@@ -253,20 +261,22 @@
     const name = document.getElementById(`name-${id}`).value || '';
     const note = document.getElementById(`note-${id}`).value || '';
 
-    await fetch(API_URL, {
-      method:'PUT',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({id, lat, lng, name, note, seen})
-    });
+    const { error } = await supabase
+      .from('points')
+      .update({ lat, lng, name, note, seen })
+      .eq('id', id);
+    
+    if(error) console.error('Error toggling seen:', error);
     await fetchPoints();
   }
 
   async function deletePoint(id){
-    await fetch(API_URL, {
-      method:'DELETE',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({id})
-    });
+    const { error } = await supabase
+      .from('points')
+      .delete()
+      .eq('id', id);
+    
+    if(error) console.error('Error deleting point:', error);
     await fetchPoints();
   }
 
@@ -280,11 +290,10 @@
       note: '',
       seen: false
     };
-    await fetch(API_URL, {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify(p)
-    });
+    
+    const { error } = await supabase.from('points').insert([p]);
+    if(error) console.error('Error creating point:', error);
+    
     await fetchPoints();
     const marker = markers.get(id);
     if(marker) marker.openPopup();
@@ -297,8 +306,10 @@
 
   async function buildList(){
     try{
-      const res = await fetch(API_URL);
-      const points = await res.json();
+      const { data, error } = await supabase.from('points').select('*');
+      if(error) throw error;
+      
+      const points = data || [];
       const list = document.getElementById('point-list');
       list.innerHTML = '';
       if(points.length === 0){
@@ -323,6 +334,7 @@
         list.appendChild(div);
       });
     }catch(e){
+      console.error('Error building list:', e);
       document.getElementById('point-list').innerHTML = '<div class="point-item">Neizdevās ielādēt punktus.</div>';
     }
   }
