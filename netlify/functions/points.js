@@ -1,4 +1,4 @@
-const fetch = require("node-fetch");
+import fetch from "node-fetch";
 
 const REPO = "zanz1bra/kgdj_uzlimes";
 const FILE = "points.json";
