@@ -181,18 +181,47 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.47.0"></script>
 <script>
   // Supabase configuration
   const SUPABASE_URL = 'https://vshfjwueojruorxkltyu.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_has7Gz7VgorBjFV9PAH2jQ_F7caqPav';
   
-  const { createClient } = window.supabase;
-  const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-
+  let supabase;
   let map;
-  let markers = new Map(); // id -> marker
+  let markers = new Map();
   let addMode = false;
+
+  // Wait for Supabase to load
+  window.addEventListener('load', () => {
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    initMap();
+  });
+
+  function initMap() {
+    map = L.map('map').setView([56.95, 24.10], 5);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap'
+    }).addTo(map);
+
+    fetchPoints();
+
+    map.on('click', e => {
+      if(!addMode) return;
+      createPoint(e.latlng);
+    });
+
+    document.getElementById('fab-add').addEventListener('click', () => {
+      addMode = !addMode;
+      document.getElementById('fab-add').classList.toggle('active', addMode);
+      document.getElementById('add-hint').textContent = addMode
+        ? 'Klikšķini kartē, lai pievienotu punktu'
+        : 'Pieskaries kartē, lai pievienotu punktu';
+    });
+
+    document.getElementById('fab-list').addEventListener('click', openList);
+  }
 
   async function fetchPoints(){
     try{
@@ -342,31 +371,6 @@
   function closeList(){
     document.getElementById('modal').style.display = 'none';
   }
-
-  document.addEventListener('DOMContentLoaded', () => {
-    map = L.map('map').setView([56.95, 24.10], 5);
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '&copy; OpenStreetMap'
-    }).addTo(map);
-
-    fetchPoints();
-
-    map.on('click', e => {
-      if(!addMode) return;
-      createPoint(e.latlng);
-    });
-
-    document.getElementById('fab-add').addEventListener('click', () => {
-      addMode = !addMode;
-      document.getElementById('fab-add').classList.toggle('active', addMode);
-      document.getElementById('add-hint').textContent = addMode
-        ? 'Klikšķini kartē, lai pievienotu punktu'
-        : 'Pieskaries kartē, lai pievienotu punktu';
-    });
-
-    document.getElementById('fab-list').addEventListener('click', openList);
-  });
 </script>
 </body>
 </html>
