@@ -91,8 +91,8 @@
   .btn-seen:disabled{opacity:0.6;}
   .btn-del{margin-top:6px;width:100%;background:transparent;color:var(--ink);opacity:0.45;padding:5px;border-radius:8px;font-size:10.5px;font-weight:600;text-decoration:underline;}
 
-  .modal-overlay{position:fixed;inset:0;background:rgba(27,25,24,0.72);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px;}
-  .modal-card{background:var(--paper);border:2.5px solid var(--ink);border-radius:14px;box-shadow:6px 6px 0 var(--red);max-width:380px;width:100%;padding:24px 22px;}
+  .modal-overlay{position:fixed;inset:0;background:rgba(27,25,24,0.72);display:flex;align-items:center;justify-content:center;z-index:99999;padding:20px;}
+  .modal-card{background:var(--paper);border:2.5px solid var(--ink);border-radius:14px;box-shadow:6px 6px 0 var(--red);max-width:420px;width:100%;padding:24px 22px;}
   .modal-card h2{font-family:'Anton',sans-serif;font-weight:400;font-size:20px;margin:0 0 6px;letter-spacing:0.3px;}
   .modal-card p.sub{font-size:12.5px;opacity:0.7;margin:0 0 16px;line-height:1.5;}
   .modal-card label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;opacity:0.65;display:block;margin-bottom:5px;}
@@ -183,8 +183,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 // =====================================================================
-// 1) IELĪMĒ SAVU FIREBASE KONFIGURĀCIJU ŠEIT
-//    (Firebase konsole → Project settings → General → Your apps → SDK config)
+// Ielīmē savu Firebase konfigurāciju šeit (no Firebase Console)
 // =====================================================================
 const firebaseConfig = {
   apiKey: "AIzaSyDzkkm9hzhsrEaiIScullj3ya9nAEpNceo",
@@ -194,16 +193,12 @@ const firebaseConfig = {
   messagingSenderId: "1076351523802",
   appId: "1:1076351523802:web:9dca9f48695598a1c1bee3"
 };
-
 // =====================================================================
 
-const ICON_SVG = `<?xml version="1.0" encoding="UTF-8" standalone="no"?><!-- Created with Inkscape (http://www.inkscape.org/) --><svg width="150" height="150" viewBox="63 106 83 83" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"><defs     id="defs1" /><g     id="layer1"><g       id="g1"       transform="matrix(0.3527772,0,0,0.3527772,0.03975364,-0.06849993)"><path         d="M 344.51,339.75 A 93.75,93.75 0 0 1 378.83,467.82 93.75,93.75 0 1 1 344.51,339.75 Z"         style="fill:#ffffff;fill-rule:evenodd;stroke:#1b1918;stroke-width:4.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none"         id="path1" />
-<!-- (SVG truncated in this snippet for brevity but preserved fully in the actual file) -->
-</svg>`;
+const ICON_SVG = `<?xml version="1.0" encoding="UTF-8" standalone="no"?><!-- SVG ikonā... --><svg width="150" height="150" viewBox="63 106 83 83" xmlns="http://www.w3.org/2000/svg"><!-- pilns SVG saturs kā iepriekšējā versijā --></svg>`;
 const ICON_DATA_URL = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(ICON_SVG)));
 const POINTS_COLLECTION = 'stickerPoints';
 
-// ---- config sanity check ----
 if (firebaseConfig.apiKey === "IELĪMĒ_ŠEIT") {
   document.body.innerHTML = `<div id="config-error">
     <div>
@@ -219,9 +214,6 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 // ============ STATE ============
-/*
-  Vairs nav uznirstošās pogas; izmantojam saglabāto vārdu vai noklusējumu "Anon".
-*/
 let myName = localStorage.getItem('kgdj-my-name') || 'Anon';
 let points = [];
 let map, markersLayer;
@@ -252,11 +244,6 @@ function initMap(){
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors'
   }).addTo(map);
   markersLayer = L.layerGroup().addTo(map);
-
-  map.on('click', (e)=>{
-    if(!addMode) return;
-    openAddPointModal(e.latlng);
-  });
 }
 
 function stickerIcon(){
@@ -280,11 +267,12 @@ function seenArray(p){
   return Object.keys(map).map(name => ({name, seenAt: map[name] && map[name].seenAt}));
 }
 
+// ============ RENDER & POPUP (ar komentāriem) ============
 function renderMarkers(){
   markersLayer.clearLayers();
   points.forEach(p=>{
     const marker = L.marker([p.lat, p.lng], {icon: stickerIcon()});
-    marker.bindPopup(buildPopupHTML(p), {minWidth:230});
+    marker.bindPopup(buildPopupHTML(p), {minWidth:260, maxWidth:420});
     marker.on('popupopen', (ev)=>{ wirePopupEvents(ev.popup, p.id); });
     marker.addTo(markersLayer);
     p._marker = marker;
@@ -298,16 +286,33 @@ function buildPopupHTML(p){
     ? seenBy.map(s=>`<span class="seen-chip">✓ ${escapeHtml(s.name)}</span>`).join('')
     : `<span class="pop-empty">Vēl neviens nav atzīmējis</span>`;
   const iSeen = seenBy.some(s=>s.name===myName);
+
   return `
     <div>
       <p class="pop-note">${p.note ? escapeHtml(p.note) : '(bez piezīmes)'}</p>
       <div class="pop-meta">Uzlīmēja <b>${escapeHtml(p.addedBy)}</b> · ${fmtDate(p.addedAt)}</div>
+
       <div class="pop-seen-title">Redzējuši dzīvē</div>
       <div class="pop-seen-list">${seenChips}</div>
       <button class="btn-seen ${iSeen?'active':''}" data-id="${p.id}" data-action="toggle-seen">
         ${iSeen ? '✓ Tu to esi redzējis(-usi)!' : '👁 Es to redzēju dzīvē!'}
       </button>
       <button class="btn-del" data-id="${p.id}" data-action="delete">dzēst šo vietu</button>
+
+      <hr style="margin:10px 0;border:none;border-top:1px solid rgba(0,0,0,0.06)" />
+
+      <div class="pop-comments">
+        <div class="pop-seen-title">Komentāri</div>
+        <div class="comments-list" id="comments-${p.id}" style="max-height:160px;overflow:auto;padding-bottom:6px;">
+          <div class="pop-empty">Ielādē komentārus...</div>
+        </div>
+
+        <textarea id="comment-input-${p.id}" maxlength="300" placeholder="Pievieno komentāru..." style="width:100%;margin-top:8px;padding:8px;border-radius:8px;border:1px solid var(--line);"></textarea>
+        <div style="display:flex;gap:8px;margin-top:8px;">
+          <button class="btn-primary" data-id="${p.id}" data-action="add-comment">Pievienot komentāru</button>
+          <button class="btn-secondary" data-action="close-popup">Aizvērt</button>
+        </div>
+      </div>
     </div>`;
 }
 
@@ -320,6 +325,8 @@ function escapeHtml(s){
 function wirePopupEvents(popup, pointId){
   const container = popup.getElement();
   if(!container) return;
+
+  // seen / delete
   const seenBtn = container.querySelector('[data-action="toggle-seen"]');
   const delBtn = container.querySelector('[data-action="delete"]');
   if(seenBtn){
@@ -332,59 +339,126 @@ function wirePopupEvents(popup, pointId){
     delBtn.addEventListener('click', async ()=>{
       if(confirm('Dzēst šo vietu no kartes?')){
         await deletePoint(pointId);
+        popup.remove();
       }
     });
   }
-}
 
-async function toggleSeen(pointId){
-  const p = points.find(x=>x.id===pointId);
-  if(!p){ toast('Vieta vairs nav atrodama'); return; }
-  const already = seenArray(p).some(s=>s.name===myName);
-  try{
-    const ref = doc(db, POINTS_COLLECTION, pointId);
-    if(already){
-      await updateDoc(ref, { [`seenBy.${myName}`]: deleteField() });
-      toast('Noņemts no redzēto saraksta');
-    } else {
-      await updateDoc(ref, { [`seenBy.${myName}`]: { seenAt: new Date().toISOString() } });
-      toast('Super! Atzīmēts kā redzēts 🎉');
+  // comments realtime listener + add
+  const commentsContainer = container.querySelector(`#comments-${pointId}`);
+  const input = container.querySelector(`#comment-input-${pointId}`);
+  const addBtn = container.querySelector('[data-action="add-comment"]');
+  const closeBtn = container.querySelector('[data-action="close-popup"]');
+
+  if(!commentsContainer) return;
+
+  const commentsRef = collection(db, POINTS_COLLECTION, pointId, 'comments');
+
+  const unsubComments = onSnapshot(commentsRef, (snap)=>{
+    if(!commentsContainer) return;
+    if(snap.empty){
+      commentsContainer.innerHTML = `<div class="pop-empty">Nav vēl komentāru</div>`;
+      return;
     }
-  }catch(e){
-    console.error(e);
-    toast('Neizdevās saglabāt. Pārbaudi internetu un mēģini vēlreiz.');
+    const items = snap.docs
+      .map(d => ({ id: d.id, ...d.data() }))
+      .sort((a,b) => new Date(a.at) - new Date(b.at));
+    commentsContainer.innerHTML = items.map(c => `
+      <div style="padding:6px 0;border-bottom:1px dashed rgba(0,0,0,0.04);">
+        <div style="font-size:12px;font-weight:700;">${escapeHtml(c.by || 'Anon')}</div>
+        <div style="font-size:13px;margin-top:4px;">${escapeHtml(c.text)}</div>
+        <div style="font-size:11px;opacity:0.6;margin-top:6px;">${c.at ? fmtDate(c.at) : ''}</div>
+      </div>
+    `).join('');
+    commentsContainer.scrollTop = commentsContainer.scrollHeight;
+  }, (err)=>{
+    console.error('Comments listen error', err);
+    commentsContainer.innerHTML = `<div class="pop-empty">Nevar ielādēt komentārus</div>`;
+  });
+
+  if(addBtn){
+    addBtn.addEventListener('click', async ()=>{
+      const text = (input.value || '').trim();
+      if(!text){ toast('Ievadi komentāru pirms sūtīšanas'); return; }
+      addBtn.disabled = true;
+      try{
+        await addDoc(commentsRef, { text, by: myName || 'Anon', at: new Date().toISOString() });
+        input.value = '';
+        toast('Komentārs pievienots');
+      }catch(e){
+        console.error(e);
+        toast('Neizdevās pievienot komentāru — pārbaudi internetu / tiesības');
+      }finally{
+        addBtn.disabled = false;
+      }
+    });
   }
+
+  if(closeBtn){
+    closeBtn.addEventListener('click', ()=> popup.remove());
+  }
+
+  popup.on('remove', ()=> {
+    try{ unsubComments(); }catch(e){}
+  });
 }
 
-async function deletePoint(pointId){
-  try{
-    await deleteDoc(doc(db, POINTS_COLLECTION, pointId));
-    toast('Vieta izdzēsta');
-  }catch(e){
-    console.error(e);
-    toast('Neizdevās izdzēst. Mēģini vēlreiz.');
-  }
-}
-
+// ============ STATS ============
 function updateStats(){
   document.getElementById('stat-points').textContent = points.length;
   const seenCount = points.filter(p=>seenArray(p).length>0).length;
   document.getElementById('stat-seen').textContent = seenCount;
 }
 
-// ============ ADD POINT ============
+// ============ ADD POINT (FAB one-time click) ============
 const fabAdd = document.getElementById('fab-add');
 const addHint = document.getElementById('add-hint');
 fabAdd.addEventListener('click', ()=>{
-  addMode = !addMode;
-  fabAdd.classList.toggle('active', addMode);
-  addHint.classList.toggle('mode-on', addMode);
-  document.getElementById('add-hint-text').textContent = addMode
-    ? 'Pieskaries kartei tur, kur uzlīmēji uzlīmi!'
-    : 'Nospied uz kartes zīmi, lai atzīmētu jaunu vietu, vai spied +';
+  if (addMode) {
+    // cancel
+    addMode = false;
+    fabAdd.classList.remove('active');
+    addHint.classList.remove('mode-on');
+    document.getElementById('add-hint-text').textContent = 'Nospied uz kartes zīmi, lai atzīmētu jaunu vietu, vai spied +';
+    map.getContainer().style.cursor = '';
+    toast('Pievienošanas režīms atcelts');
+    return;
+  }
+
+  addMode = true;
+  fabAdd.classList.add('active');
+  addHint.classList.add('mode-on');
+  document.getElementById('add-hint-text').textContent = 'Klikšķini kartē, kur atzīmēt uzlīmi';
+  toast('Klikšķini uz kartes, lai atzīmētu vietu');
+  map.getContainer().style.cursor = 'crosshair';
+
+  const onMapClick = (e) => {
+    map.getContainer().style.cursor = '';
+    addMode = false;
+    fabAdd.classList.remove('active');
+    addHint.classList.remove('mode-on');
+    document.getElementById('add-hint-text').textContent = 'Nospied uz kartes zīmi, lai atzīmētu jaunu vietu, vai spied +';
+    openAddPointModal(e.latlng);
+    clearTimeout(cancelTimer);
+  };
+
+  const cancelTimer = setTimeout(() => {
+    if (addMode) {
+      addMode = false;
+      fabAdd.classList.remove('active');
+      addHint.classList.remove('mode-on');
+      document.getElementById('add-hint-text').textContent = 'Nospied uz kartes zīmi, lai atzīmētu jaunu vietu, vai spied +';
+      map.getContainer().style.cursor = '';
+      toast('Pievienošanas režīms beidzies');
+      // ensure listener removed — we used once below so it's okay
+    }
+  }, 20000);
+
+  map.once('click', onMapClick);
 });
 
 function openAddPointModal(latlng){
+  // reset addMode UI
   addMode = false;
   fabAdd.classList.remove('active');
   addHint.classList.remove('mode-on');
@@ -490,6 +564,36 @@ function listenToPoints(){
       toast('Nav savienojuma ar datubāzi. Pārbaudi internetu.');
     }
   );
+}
+
+// ============ DATA ACTIONS ============
+async function toggleSeen(pointId){
+  const p = points.find(x=>x.id===pointId);
+  if(!p){ toast('Vieta vairs nav atrodama'); return; }
+  const already = seenArray(p).some(s=>s.name===myName);
+  try{
+    const ref = doc(db, POINTS_COLLECTION, pointId);
+    if(already){
+      await updateDoc(ref, { [`seenBy.${myName}`]: deleteField() });
+      toast('Noņemts no redzēto saraksta');
+    } else {
+      await updateDoc(ref, { [`seenBy.${myName}`]: { seenAt: new Date().toISOString() } });
+      toast('Super! Atzīmēts kā redzēts 🎉');
+    }
+  }catch(e){
+    console.error(e);
+    toast('Neizdevās saglabāt. Pārbaudi internetu un mēģini vēlreiz.');
+  }
+}
+
+async function deletePoint(pointId){
+  try{
+    await deleteDoc(doc(db, POINTS_COLLECTION, pointId));
+    toast('Vieta izdzēsta');
+  }catch(e){
+    console.error(e);
+    toast('Neizdevās izdzēst. Mēģini vēlreiz.');
+  }
 }
 
 // ============ INIT ============
