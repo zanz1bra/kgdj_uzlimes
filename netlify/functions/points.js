@@ -4,7 +4,7 @@ const REPO = "zanz1bra/kgdj_uzlimes";
 const FILE = "points.json";
 const TOKEN = process.env.GITHUB_TOKEN;
 
-exports.handler = async (event) => {
+export async function handler(event) {
   const method = event.httpMethod;
 
   async function readFile() {
@@ -33,13 +33,11 @@ exports.handler = async (event) => {
     });
   }
 
-  // GET — return all points
   if (method === "GET") {
     const { points } = await readFile();
     return { statusCode: 200, body: JSON.stringify(points) };
   }
 
-  // POST — create new point
   if (method === "POST") {
     const newPoint = JSON.parse(event.body);
     const { points, sha } = await readFile();
@@ -48,17 +46,6 @@ exports.handler = async (event) => {
     return { statusCode: 200, body: JSON.stringify({ ok: true }) };
   }
 
-  // PUT — update point
-  if (method === "PUT") {
-    const updated = JSON.parse(event.body);
-    const { points, sha } = await readFile();
-    const idx = points.findIndex(p => p.id === updated.id);
-    if (idx !== -1) points[idx] = updated;
-    await writeFile(points, sha);
-    return { statusCode: 200, body: JSON.stringify({ ok: true }) };
-  }
-
-  // DELETE — delete point
   if (method === "DELETE") {
     const { id } = JSON.parse(event.body);
     const { points, sha } = await readFile();
@@ -68,4 +55,4 @@ exports.handler = async (event) => {
   }
 
   return { statusCode: 400, body: "Unsupported method" };
-};
+}
