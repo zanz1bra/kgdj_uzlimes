@@ -2,11 +2,10 @@
 <html lang="lv">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KGDJ Uzlīmju Karte</title>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
-<link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
@@ -16,137 +15,57 @@
     --paper2:#ece4d2;
     --red:#e30016;
     --purple:#9933cc;
-    --line:rgba(27,25,24,0.18);
     --white:#ffffff;
   }
 
-  *{box-sizing:border-box;}
-  html,body{
-    height:100%;
-    margin:0;
-    padding:0;
-    font-family:'Space Grotesk',system-ui,sans-serif;
-    background:var(--ink);
-    color:var(--ink);
-  }
+  html,body{margin:0;padding:0;height:100%;background:var(--ink);font-family:'Space Grotesk',sans-serif;}
 
-  #app{
-    display:flex;
-    flex-direction:column;
-    height:100vh;
-    height:100dvh;
-    overflow:hidden;
-  }
+  #app{display:flex;flex-direction:column;height:100vh;overflow:hidden;}
 
   header{
-    background:var(--ink);
-    color:var(--paper);
-    padding:10px 16px;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:10px;
-    border-bottom:3px solid var(--red);
-    z-index:20;
-    flex-wrap:wrap;
-  }
-
-  .brand{display:flex;align-items:center;gap:10px;min-width:0;}
-  .brand-badge{
-    width:34px;height:34px;border-radius:50%;
-    background:var(--red);border:2px solid var(--paper);
-    flex:0 0 auto;display:flex;align-items:center;justify-content:center;
-    font-family:'Anton',sans-serif;font-size:11px;color:var(--ink);
-    letter-spacing:0.5px;
-  }
-  .brand h1{
-    font-family:'Anton', sans-serif;font-weight:400;
-    font-size:19px;letter-spacing:0.5px;margin:0;
-    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  }
-  .brand .tagline{font-size:11px;opacity:0.65;margin-top:1px;white-space:nowrap;}
-
-  #map-wrap{
-    position:relative;
-    flex:1;
-    min-height:0;
-    z-index:0; /* IMPORTANT FIX */
-  }
-
-  #map{
-    position:absolute;
-    inset:0;
-    background:var(--paper2);
-    z-index:1; /* IMPORTANT FIX */
-  }
-
-  /* Leaflet stacking fix */
-  .leaflet-container{
-    z-index:1 !important;
-  }
-
-  /* Popup styling */
-  .leaflet-popup-content-wrapper{
-    background:var(--paper);
-    border:2px solid var(--ink);
-    border-radius:10px;
-    box-shadow:3px 3px 0 var(--ink);
-  }
-  .leaflet-popup-tip{
-    background:var(--paper);
-    border:2px solid var(--ink);
-  }
-  .leaflet-popup-content{margin:12px 14px;min-width:220px;}
-  .leaflet-container a.leaflet-popup-close-button{color:var(--ink);font-size:20px;}
-
-  /* Floating UI elements */
-  #add-hint,
-  #fab-add,
-  #fab-list,
-  #conn-badge{
-    position:absolute;
-    z-index:999999 !important; /* CRITICAL FIX */
-    pointer-events:auto;
-  }
-
-  #add-hint{
-    top:14px;left:50%;transform:translateX(-50%);
     background:var(--ink);color:var(--paper);
-    padding:8px 16px;border-radius:20px;
-    font-size:12.5px;font-weight:600;
-    box-shadow:0 3px 10px rgba(0,0,0,0.3);
-    display:flex;align-items:center;gap:8px;
-    max-width:90%;text-align:center;
+    padding:10px 16px;border-bottom:3px solid var(--red);
+    display:flex;align-items:center;gap:10px;
+  }
+
+  #map-wrap{position:relative;flex:1;min-height:0;z-index:0;}
+  #map{position:absolute;inset:0;background:var(--paper2);z-index:1;}
+
+  .leaflet-container{z-index:1 !important;}
+
+  /* Floating UI */
+  #add-hint{
+    position:absolute;top:14px;left:50%;transform:translateX(-50%);
+    background:var(--ink);color:var(--paper);
+    padding:8px 16px;border-radius:20px;font-size:12px;
+    z-index:999999;pointer-events:none; /* IMPORTANT FIX */
+    opacity:0.85;
   }
 
   #fab-add{
-    bottom:22px;right:16px;
-    background:var(--red);color:var(--paper);
+    position:absolute;bottom:22px;right:16px;
     width:56px;height:56px;border-radius:50%;
+    background:var(--red);color:var(--paper);
     font-size:28px;font-weight:700;
-    box-shadow:0 4px 14px rgba(0,0,0,0.4);
     display:flex;align-items:center;justify-content:center;
-    transition:transform .15s, background .15s;
+    z-index:999999;cursor:pointer;
   }
 
   #fab-list{
-    bottom:22px;left:16px;
+    position:absolute;bottom:22px;left:16px;
     background:var(--paper);color:var(--ink);
-    border:2px solid var(--ink);
-    padding:10px 16px;border-radius:24px;
-    font-size:13px;font-weight:700;
-    box-shadow:0 4px 14px rgba(0,0,0,0.3);
-    display:flex;align-items:center;gap:6px;
+    border:2px solid var(--ink);padding:10px 16px;
+    border-radius:24px;font-size:13px;font-weight:700;
+    z-index:999999;cursor:pointer;
   }
 
   #conn-badge{
-    top:14px;right:14px;
-    font-size:10.5px;font-weight:700;
-    padding:4px 10px;border-radius:12px;
+    position:absolute;top:14px;right:14px;
     background:var(--paper);color:var(--ink);
-    opacity:0.95;
+    padding:4px 10px;border-radius:12px;
+    font-size:11px;font-weight:700;
+    z-index:999999;
   }
-
 </style>
 </head>
 
@@ -154,19 +73,14 @@
 <div id="app">
 
 <header>
-  <div class="brand">
-    <div class="brand-badge">KGDJ</div>
-    <div>
-      <h1>Uzlīmju Karte</h1>
-      <div class="tagline">Kur esam atstājuši savu nospiedumu</div>
-    </div>
-  </div>
+  <div class="brand-badge" style="background:var(--red);border:2px solid var(--paper);width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Anton';font-size:11px;color:var(--ink);">KGDJ</div>
+  <h1 style="font-family:'Anton';font-size:20px;color:var(--paper);margin:0;">Uzlīmju Karte</h1>
 </header>
 
 <div id="map-wrap">
   <div id="map"></div>
 
-  <div id="add-hint"><span class="dot"></span> Pieskaries kartē, lai pievienotu punktu</div>
+  <div id="add-hint">Pieskaries kartē, lai pievienotu punktu</div>
   <div id="fab-add">+</div>
   <div id="fab-list">Saraksts</div>
   <div id="conn-badge">Savienots</div>
@@ -177,6 +91,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 
 <script>
+  /* --- INITIALIZE MAP --- */
   const map = L.map('map').setView([56.95, 24.10], 5);
 
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -184,8 +99,24 @@
     attribution: '&copy; OpenStreetMap'
   }).addTo(map);
 
-  // Example marker
-  L.marker([56.95, 24.10]).addTo(map).bindPopup("Rīga — KGDJ uzlīme!");
+  /* --- REMOVE STATIC RIGA MARKER --- */
+  // (Deleted)
+
+  /* --- ADD MARKER ON MAP CLICK --- */
+  map.on("click", function(e){
+    const marker = L.marker(e.latlng).addTo(map);
+    marker.bindPopup("Jauns punkts!").openPopup();
+  });
+
+  /* --- BUTTON: ADD MODE --- */
+  document.getElementById("fab-add").addEventListener("click", function(){
+    alert("Šeit tu varēsi pievienot punktu ar formu (vēl nav ieviests).");
+  });
+
+  /* --- BUTTON: LIST --- */
+  document.getElementById("fab-list").addEventListener("click", function(){
+    alert("Šeit būs punktu saraksts (vēl nav ieviests).");
+  });
 </script>
 
 </body>
