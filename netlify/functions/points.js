@@ -46,6 +46,17 @@ export async function handler(event) {
     return { statusCode: 200, body: JSON.stringify({ ok: true }) };
   }
 
+  if (method === "PUT") {
+    const updatedPoint = JSON.parse(event.body);
+    const { points, sha } = await readFile();
+    const index = points.findIndex(p => p.id === updatedPoint.id);
+    if (index !== -1) {
+      points[index] = updatedPoint;
+    }
+    await writeFile(points, sha);
+    return { statusCode: 200, body: JSON.stringify({ ok: true }) };
+  }
+
   if (method === "DELETE") {
     const { id } = JSON.parse(event.body);
     const { points, sha } = await readFile();
