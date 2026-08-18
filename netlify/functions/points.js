@@ -26,23 +26,22 @@ function writePoints(points) {
   }
 }
 
-export const handler = async (event) => {
-  const method = event.httpMethod;
+export default async (req, context) => {
+  const method = req.method;
 
   try {
     // GET: fetch all points
     if (method === 'GET') {
       const points = readPoints();
-      return {
-        statusCode: 200,
+      return new Response(JSON.stringify(points), {
+        status: 200,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(points),
-      };
+      });
     }
 
     // POST: create a new point
     if (method === 'POST') {
-      const body = JSON.parse(event.body || '{}');
+      const body = await req.json();
       const points = readPoints();
       const newPoint = {
         id: body.id,
@@ -54,24 +53,22 @@ export const handler = async (event) => {
       };
       points.push(newPoint);
       writePoints(points);
-      return {
-        statusCode: 201,
+      return new Response(JSON.stringify(newPoint), {
+        status: 201,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newPoint),
-      };
+      });
     }
 
     // PUT: update an existing point
     if (method === 'PUT') {
-      const body = JSON.parse(event.body || '{}');
+      const body = await req.json();
       let points = readPoints();
       const index = points.findIndex((p) => p.id === body.id);
       if (index === -1) {
-        return {
-          statusCode: 404,
+        return new Response(JSON.stringify({ error: 'Point not found' }), {
+          status: 404,
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ error: 'Point not found' }),
-        };
+        });
       }
       points[index] = {
         id: body.id,
@@ -82,46 +79,44 @@ export const handler = async (event) => {
         seen: body.seen || false,
       };
       writePoints(points);
-      return {
-        statusCode: 200,
+      return new Response(JSON.stringify(points[index]), {
+        status: 200,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(points[index]),
-      };
+      });
     }
 
     // DELETE: remove a point
     if (method === 'DELETE') {
-      const body = JSON.parse(event.body || '{}');
+      const body = await req.json();
       let points = readPoints();
       const initialLength = points.length;
       points = points.filter((p) => p.id !== body.id);
       if (points.length === initialLength) {
-        return {
-          statusCode: 404,
+        return new Response(JSON.stringify({ error: 'Point not found' }), {
+          status: 404,
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ error: 'Point not found' }),
-        };
+        });
       }
       writePoints(points);
-      return {
-        statusCode: 200,
+      return new Response(JSON.stringify({ success: true }), {
+        status: 200,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ success: true }),
-      };
+      });
     }
 
     // Unsupported method
-    return {
-      statusCode: 405,
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+      status: 405,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ error: 'Method not allowed' }),
-    };
+    });
   } catch (e) {
     console.error('Function error:', e);
-    return {
-      statusCode: 500,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ error: 'Internal server error', details: e.message }),
-    };
+    return new Response(
+      JSON.stringify({ error: 'Internal server error', details: e.message }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 };
