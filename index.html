@@ -179,8 +179,8 @@
         <svg width="40" height="40" viewBox="0 0 210 297" xmlns="http://www.w3.org/2000/svg"><defs/><g id="layer1"><g id="g1" transform="matrix(0.3527772,0,0,0.3527772,0.03975364,-0.06849993)"><path d="M0 0h595v842H0z" fill="none"/></g></g></svg>
       </div>
       <div>
-        <h1>Ko gan darītu Jēzus ar uzlīmēm?</h1>
-        <div class="tagline">Nestu savu gaismu pasaulē!</div>
+        <h1>Uzlīmju Jēzus</h1>
+        <div class="tagline">Nes Jēzus gaismu pasaulē un meklē to dzīves tumšajos brīžos</div>
       </div>
     </div>
   </header>
@@ -360,49 +360,49 @@
     }
   }
 
-  async function savePoint(id) {
-    const name = document.getElementById(`name-${id}`).value || '';
-    const commentInput = document.getElementById(`comment-${id}`);
-    const newComment = commentInput ? commentInput.value.trim() : '';
+ async function savePoint(id) {
+  const name = document.getElementById(`name-${id}`).value || '';
+  const commentInput = document.getElementById(`comment-${id}`);
+  const newComment = commentInput ? commentInput.value.trim() : '';
 
-    const marker = markers.get(id);
-    if (!marker) return;
+  const marker = markers.get(id);
+  if (!marker) return;
 
-    const current = pointsCache.find(p => p.id === id);
-    if (!current) return;
+  const current = pointsCache.find(p => p.id === id);
+  if (!current) return;
 
-    const comments = Array.isArray(current.comments) ? [...current.comments] : [];
+  const comments = Array.isArray(current.comments) ? [...current.comments] : [];
 
-    if (newComment) {
-      comments.push({
-        id: crypto.randomUUID(),
-        text: newComment,
-        createdAt: new Date().toISOString()
-      });
-    }
-
-    const { lat, lng } = marker.getLatLng();
-
-    const updatedPoint = {
-      ...current,
-      lat,
-      lng,
-      name,
-      comments
-    };
-
-    const { error } = await supabase
-      .from('points')
-      .update(updatedPoint)
-      .eq('id', id);
-
-    if (error) {
-      console.error('Error updating point:', error);
-      return;
-    }
-
-    await fetchPoints();
+  if (newComment) {
+    comments.push({
+      id: crypto.randomUUID(),
+      text: newComment,
+      createdAt: new Date().toISOString()
+    });
   }
+
+  const { lat, lng } = marker.getLatLng();
+
+  const updatedPoint = {
+    ...current,
+    lat,
+    lng,
+    name,
+    comments
+  };
+
+  const { error } = await supabase
+    .from('points')
+    .update(updatedPoint)
+    .eq('id', id);
+
+  if (error) {
+    console.error('Error updating point:', error);
+    return;
+  }
+
+  await fetchPoints();
+}
 
   async function deletePoint(id) {
     const ok = window.confirm('Vai tiešām dzēst šo punktu?');
