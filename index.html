@@ -187,6 +187,7 @@
   let supabase;
   let map;
   let markers = new Map();
+  let pointsCache = [];
   let addMode = false;
 
   // Custom marker icon using the full KGDJ logo PNG
@@ -254,7 +255,8 @@
     try{
       const { data, error } = await supabase.from('points').select('*');
       if(error) throw error;
-      renderPoints(data || []);
+      pointsCache = data || [];
+      renderPoints(pointsCache);
       document.getElementById('conn-badge').textContent = 'Savienots ✓';
     }catch(e){
       console.error('Error fetching points:', e);
@@ -287,6 +289,19 @@
     `;
   }
 
+  function removePointFromUI(id){
+    const marker = markers.get(id);
+    if(marker){
+      map.removeLayer(marker);
+      markers.delete(id);
+    }
+    pointsCache = pointsCache.filter(p => p.id !== id);
+
+    if (document.getElementById('modal').style.display === 'flex') {
+      buildListFromCache();
+    }
+  }
+
   async function savePoint(id){
     const name = document.getElementById(`name-${id}`).value || '';
     const note = document.getElementById(`note-${id}`).value || '';
@@ -310,6 +325,9 @@
   }
 
   async function deletePoint(id){
+    const ok = window.confirm('Vai tiešām dzēst šo punktu?');
+    if(!ok) return;
+
     const { error } = await supabase
       .from('points')
       .delete()
@@ -320,7 +338,7 @@
       return;
     }
 
-    await fetchPoints();
+    removePointFromUI(id);
   }
 
   async function createPoint(latlng){
@@ -357,34 +375,41 @@
       const { data, error } = await supabase.from('points').select('*');
       if(error) throw error;
 
-      const points = data || [];
-      const list = document.getElementById('point-list');
-      list.innerHTML = '';
-      if(points.length === 0){
-        list.innerHTML = '<div class="point-item">Vēl nav neviena punkta.</div>';
-        return;
-      }
-      points.forEach(p => {
-        const div = document.createElement('div');
-        div.className = 'point-item';
-        div.innerHTML = `
-          <div><b>${escapeHtml(p.name || 'Bez nosaukuma')}</b></div>
-          <div class="point-meta">${escapeHtml(p.note || '')}</div>
-        `;
-        div.onclick = () => {
-          document.getElementById('modal').style.display = 'none';
-          const m = markers.get(p.id);
-          if(m){
-            map.setView([p.lat, p.lng], 10);
-            m.openPopup();
-          }
-        };
-        list.appendChild(div);
-      });
+      pointsCache = data || [];
+      buildListFromCache();
     }catch(e){
       console.error('Error building list:', e);
       document.getElementById('point-list').innerHTML = '<div class="point-item">Neizdevās ielādēt punktus.</div>';
     }
+  }
+
+  function buildListFromCache(){
+    const points = pointsCache || [];
+    const list = document.getElementById('point-list');
+    list.innerHTML = '';
+
+    if(points.length === 0){
+      list.innerHTML = '<div class="point-item">Vēl nav neviena punkta.</div>';
+      return;
+    }
+
+    points.forEach(p => {
+      const div = document.createElement('div');
+      div.className = 'point-item';
+      div.innerHTML = `
+        <div><b>${escapeHtml(p.name || 'Bez nosaukuma')}</b></div>
+        <div class="point-meta">${escapeHtml(p.note || '')}</div>
+      `;
+      div.onclick = () => {
+        document.getElementById('modal').style.display = 'none';
+        const m = markers.get(p.id);
+        if(m){
+          map.setView([p.lat, p.lng], 10);
+          m.openPopup();
+        }
+      };
+      list.appendChild(div);
+    });
   }
 
   function closeList(){
