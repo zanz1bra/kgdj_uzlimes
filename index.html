@@ -148,7 +148,7 @@
   <header>
     <div class="brand">
       <div class="brand-logo" id="logo-container">
-        <svg width="40" height="40" viewBox="0 0 210 297" xmlns="http://www.w3.org/2000/svg"><defs/><g id="layer1"><g id="g1" transform="matrix(0.3527772,0,0,0.3527772,0.03975364,-0.06849993)"><path id="path3" style="fill:#e30016;stroke-width:0.264583" d="M 18.572271,835.27058 H 576.70576 V 1.7945286 H 19.313921 Z" /><path id="path4" style="fill:#ffffff;stroke-width:0.264583" d="M 560.33336,820.02716 H 35.797249 V 17.432911 H 560.16208 Z" /></g></g></svg>
+        <svg width="40" height="40" viewBox="0 0 210 297" xmlns="http://www.w3.org/2000/svg"><defs/><g id="layer1"><g id="g1" transform="matrix(0.3527772,0,0,0.3527772,0.03975364,-0.06849993)"><path d="M0 0h595v842H0z" fill="none"/></g></g></svg>
       </div>
       <div>
         <h1>Ko gan darītu Jēzus ar uzlīmēm?</h1>
@@ -292,6 +292,7 @@
   function removePointFromUI(id){
     const marker = markers.get(id);
     if(marker){
+      marker.closePopup();
       map.removeLayer(marker);
       markers.delete(id);
     }
