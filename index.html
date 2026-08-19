@@ -41,36 +41,109 @@
       gap:10px;border-bottom:3px solid var(--red);
       flex-wrap:wrap;
     }
+
     .brand{display:flex;align-items:center;gap:10px;}
-    .brand-logo{width:40px;height:40px;display:flex;align-items:center;justify-content:center;}
-    .brand-logo svg{width:100%;height:100%;}
-    .brand h1{font-family: Geneva, Verdana, sans-serif;font-weight:400;font-size:19px;letter-spacing:0.5px;margin:0;}
+    .brand-logo{
+      width:40px;height:40px;
+      display:flex;align-items:center;justify-content:center;
+    }
+    .brand-logo svg{
+      width:100%;height:100%;
+    }
+    .brand h1{
+      font-family: Geneva, Verdana, sans-serif;font-weight:400;
+      font-size:19px;letter-spacing:0.5px;margin:0;
+    }
     .brand .tagline{font-size:11px;opacity:0.7;margin-top:2px;}
 
-    #map-wrap{position:relative;flex:1;min-height:0;z-index:0;}
-    #map{position:absolute;inset:0;background:var(--paper2);z-index:1;}
+    #map-wrap{
+      position:relative;
+      flex:1;
+      min-height:0;
+      z-index:0;
+    }
+    #map{
+      position:absolute;
+      inset:0;
+      background:var(--paper2);
+      z-index:1;
+    }
     .leaflet-container{z-index:1 !important;}
 
-    #add-hint{position:absolute;top:14px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:8px 16px;border-radius:20px;font-size:12px;font-weight:600;z-index:999999;pointer-events:none;opacity:0.9;}
-    #fab-add{position:absolute;bottom:22px;right:16px;width:56px;height:56px;border-radius:50%;background:var(--red);color:var(--paper);font-size:28px;font-weight:700;display:flex;align-items:center;justify-content:center;z-index:999999;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,0.4);}
+    #add-hint{
+      position:absolute;top:14px;left:50%;transform:translateX(-50%);
+      background:var(--ink);color:var(--paper);
+      padding:8px 16px;border-radius:20px;
+      font-size:12px;font-weight:600;
+      z-index:999999;pointer-events:none;
+      opacity:0.9;
+    }
+    #fab-add{
+      position:absolute;bottom:22px;right:16px;
+      width:56px;height:56px;border-radius:50%;
+      background:var(--red);color:var(--paper);
+      font-size:28px;font-weight:700;
+      display:flex;align-items:center;justify-content:center;
+      z-index:999999;cursor:pointer;
+      box-shadow:0 4px 14px rgba(0,0,0,0.4);
+    }
     #fab-add.active{background:var(--purple);transform:rotate(45deg);}
-    #fab-list{position:absolute;bottom:22px;left:16px;background:var(--paper);color:var(--ink);border:2px solid var(--ink);padding:10px 16px;border-radius:24px;font-size:13px;font-weight:700;z-index:999999;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,0.3);}
-    #conn-badge{position:absolute;top:14px;right:14px;background:var(--paper);color:var(--ink);padding:4px 10px;border-radius:12px;font-size:11px;font-weight:700;z-index:999999;}
+    #fab-list{
+      position:absolute;bottom:22px;left:16px;
+      background:var(--paper);color:var(--ink);
+      border:2px solid var(--ink);padding:10px 16px;
+      border-radius:24px;font-size:13px;font-weight:700;
+      z-index:999999;cursor:pointer;
+      box-shadow:0 4px 14px rgba(0,0,0,0.3);
+    }
+    #conn-badge{
+      position:absolute;top:14px;right:14px;
+      background:var(--paper);color:var(--ink);
+      padding:4px 10px;border-radius:12px;
+      font-size:11px;font-weight:700;
+      z-index:999999;
+    }
 
     .leaflet-popup-content{min-width:230px;}
     .pop-label{font-size:12px;margin-bottom:4px;}
-    .pop-input{width:100%;padding:6px 8px;font-size:12px;margin-bottom:8px;border:1px solid var(--ink);border-radius:6px;}
-    .btn-pop{width:100%;padding:8px;border-radius:8px;border:none;cursor:pointer;font-size:12px;font-weight:700;margin-bottom:6px;}
+    .pop-input{
+      width:100%;padding:6px 8px;font-size:12px;margin-bottom:8px;
+      border:1px solid var(--ink);border-radius:6px;
+    }
+    .btn-pop{
+      width:100%;padding:8px;border-radius:8px;
+      border:none;cursor:pointer;font-size:12px;font-weight:700;
+      margin-bottom:6px;
+    }
     .btn-save{background:var(--ink);color:var(--paper);}
     .btn-delete{background:transparent;color:var(--ink);text-decoration:underline;font-size:11px;}
 
-    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;z-index:1000000;}
-    .modal-card{background:var(--paper);border:2px solid var(--ink);border-radius:12px;max-width:420px;width:90%;padding:16px;}
-    .modal-card h2{margin:0 0 8px;font-family:'Anton',sans-serif;font-size:18px;}
-    .point-item{padding:8px 0;border-bottom:1px solid rgba(0,0,0,0.1);font-size:13px;}
+    .modal-overlay{
+      position:fixed;inset:0;background:rgba(0,0,0,0.6);
+      display:none;align-items:center;justify-content:center;
+      z-index:1000000;
+    }
+    .modal-card{
+      background:var(--paper);border:2px solid var(--ink);
+      border-radius:12px;max-width:420px;width:90%;
+      padding:16px;
+    }
+    .modal-card h2{
+      margin:0 0 8px;font-family:'Anton',sans-serif;font-size:18px;
+    }
+    .point-item{
+      padding:8px 0;border-bottom:1px solid rgba(0,0,0,0.1);
+      font-size:13px;
+      cursor:pointer;
+    }
     .point-meta{font-size:11px;opacity:0.7;}
-    .modal-close{margin-top:10px;font-size:12px;text-align:right;}
-    .modal-close button{border:none;background:transparent;color:var(--ink);text-decoration:underline;cursor:pointer;font-size:12px;}
+    .modal-close{
+      margin-top:10px;font-size:12px;text-align:right;
+    }
+    .modal-close button{
+      border:none;background:transparent;color:var(--ink);
+      text-decoration:underline;cursor:pointer;font-size:12px;
+    }
   </style>
 </head>
 <body>
@@ -99,7 +172,9 @@
     <div class="modal-card">
       <h2>Uzlīmju punkti</h2>
       <div id="point-list"></div>
-      <div class="modal-close"><button onclick="closeList()">Aizvērt</button></div>
+      <div class="modal-close">
+        <button onclick="closeList()">Aizvērt</button>
+      </div>
     </div>
   </div>
 </div>
@@ -161,7 +236,7 @@
     fetchPoints();
 
     map.on('click', e => {
-      if(!addMode) return;
+      if (!addMode) return;
       createPoint(e.latlng);
     });
 
@@ -169,20 +244,20 @@
     document.getElementById('fab-list').addEventListener('click', openList);
   }
 
-  async function fetchPoints(){
-    try{
+  async function fetchPoints() {
+    try {
       const { data, error } = await supabase.from('points').select('*');
-      if(error) throw error;
+      if (error) throw error;
       pointsCache = data || [];
       renderPoints(pointsCache);
       document.getElementById('conn-badge').textContent = 'Savienots ✓';
-    }catch(e){
+    } catch (e) {
       console.error('Error fetching points:', e);
       document.getElementById('conn-badge').textContent = 'Savienojums neizdevās';
     }
   }
 
-  function renderPoints(points){
+  function renderPoints(points) {
     clearMarkers();
     points.forEach(p => {
       const marker = L.marker([p.lat, p.lng], { icon: customIcon }).addTo(map);
@@ -191,7 +266,7 @@
     });
   }
 
-  function popupHtml(p){
+  function popupHtml(p) {
     const safeName = escapeHtml(p.name || '');
     const safeNote = escapeHtml(p.note || '');
 
@@ -207,13 +282,16 @@
     `;
   }
 
-  function removePointFromUI(id){
+  function removePointFromUI(id) {
     const marker = markers.get(id);
-    if(marker){
+    if (marker) {
       marker.closePopup();
+      if (map.hasLayer(marker)) {
+        map.removeLayer(marker);
+      }
       markers.delete(id);
-      map.removeLayer(marker);
     }
+
     pointsCache = pointsCache.filter(p => p.id !== id);
 
     if (document.getElementById('modal').style.display === 'flex') {
@@ -221,15 +299,20 @@
     }
   }
 
-  async function savePoint(id){
+  async function savePoint(id) {
     const name = document.getElementById(`name-${id}`).value || '';
     const note = document.getElementById(`note-${id}`).value || '';
     const marker = markers.get(id);
     if (!marker) return;
 
-    const {lat, lng} = marker.getLatLng();
-    const { error } = await supabase.from('points').update({ lat, lng, name, note }).eq('id', id);
-    if(error) {
+    const { lat, lng } = marker.getLatLng();
+
+    const { error } = await supabase
+      .from('points')
+      .update({ lat, lng, name, note })
+      .eq('id', id);
+
+    if (error) {
       console.error('Error updating point:', error);
       return;
     }
@@ -237,44 +320,36 @@
     await fetchPoints();
   }
 
-async function deletePoint(id){
-  const ok = window.confirm('Vai tiešām dzēst šo punktu?');
-  if(!ok) return;
+  async function deletePoint(id) {
+    const ok = window.confirm('Vai tiešām dzēst šo punktu?');
+    if (!ok) return;
 
-  // Remove from UI immediately
-  const marker = markers.get(id);
-  if(marker){
-    marker.closePopup();
-    map.removeLayer(marker);
-    markers.delete(id);
+    removePointFromUI(id);
+
+    const { error } = await supabase
+      .from('points')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error deleting point:', error);
+      await fetchPoints();
+    }
   }
 
-  pointsCache = pointsCache.filter(p => p.id !== id);
-
-  if (document.getElementById('modal').style.display === 'flex') {
-    buildListFromCache();
-  }
-
-  // Then delete from Supabase
-  const { error } = await supabase
-    .from('points')
-    .delete()
-    .eq('id', id);
-
-  if(error) {
-    console.error('Error deleting point:', error);
-    // If the database delete fails, refresh from server so UI matches reality
-    await fetchPoints();
-    return;
-  }
-}
-
-  async function createPoint(latlng){
+  async function createPoint(latlng) {
     const id = crypto.randomUUID();
-    const p = { id, lat: latlng.lat, lng: latlng.lng, name: '', note: '', seen: false };
+    const p = {
+      id,
+      lat: latlng.lat,
+      lng: latlng.lng,
+      name: '',
+      note: '',
+      seen: false
+    };
 
     const { error } = await supabase.from('points').insert([p]);
-    if(error) {
+    if (error) {
       console.error('Error creating point:', error);
       return;
     }
@@ -283,32 +358,32 @@ async function deletePoint(id){
     await fetchPoints();
 
     const marker = markers.get(id);
-    if(marker) marker.openPopup();
+    if (marker) marker.openPopup();
   }
 
-  function openList(){
+  function openList() {
     document.getElementById('modal').style.display = 'flex';
     buildList();
   }
 
-  async function buildList(){
-    try{
+  async function buildList() {
+    try {
       const { data, error } = await supabase.from('points').select('*');
-      if(error) throw error;
+      if (error) throw error;
       pointsCache = data || [];
       buildListFromCache();
-    }catch(e){
+    } catch (e) {
       console.error('Error building list:', e);
       document.getElementById('point-list').innerHTML = '<div class="point-item">Neizdevās ielādēt punktus.</div>';
     }
   }
 
-  function buildListFromCache(){
+  function buildListFromCache() {
     const points = pointsCache || [];
     const list = document.getElementById('point-list');
     list.innerHTML = '';
 
-    if(points.length === 0){
+    if (points.length === 0) {
       list.innerHTML = '<div class="point-item">Vēl nav neviena punkta.</div>';
       return;
     }
@@ -316,11 +391,14 @@ async function deletePoint(id){
     points.forEach(p => {
       const div = document.createElement('div');
       div.className = 'point-item';
-      div.innerHTML = `<div><b>${escapeHtml(p.name || 'Bez nosaukuma')}</b></div><div class="point-meta">${escapeHtml(p.note || '')}</div>`;
+      div.innerHTML = `
+        <div><b>${escapeHtml(p.name || 'Bez nosaukuma')}</b></div>
+        <div class="point-meta">${escapeHtml(p.note || '')}</div>
+      `;
       div.onclick = () => {
         document.getElementById('modal').style.display = 'none';
         const m = markers.get(p.id);
-        if(m){
+        if (m) {
           map.setView([p.lat, p.lng], 10);
           m.openPopup();
         }
@@ -329,7 +407,7 @@ async function deletePoint(id){
     });
   }
 
-  function closeList(){
+  function closeList() {
     document.getElementById('modal').style.display = 'none';
   }
 </script>
