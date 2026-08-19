@@ -25,7 +25,7 @@ export default async (req, context) => {
         lat: body.lat,
         lng: body.lng,
         name: body.name || "",
-        note: body.note || "",
+        comments: Array.isArray(body.comments) ? body.comments : [],
         seen: body.seen || false,
       };
       points.push(newPoint);
@@ -53,7 +53,7 @@ export default async (req, context) => {
         lat: body.lat,
         lng: body.lng,
         name: body.name || "",
-        note: body.note || "",
+        comments: Array.isArray(body.comments) ? body.comments : [],
         seen: body.seen || false,
       };
       await store.set("data", JSON.stringify(points));
