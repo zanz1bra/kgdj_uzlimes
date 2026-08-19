@@ -5,10 +5,23 @@ export default async (req, context) => {
   const store = getStore("points");
 
   try {
+    const loadPoints = async () => {
+      const data = await store.get("data");
+      return data ? JSON.parse(data) : [];
+    };
+
+    const normalizeComments = (value) => Array.isArray(value) ? value : [];
+
     // GET: fetch all points
     if (method === "GET") {
-      const data = await store.get("data");
-      const points = data ? JSON.parse(data) : [];
+      const points = (await loadPoints()).map((p) => ({
+        id: p.id,
+        lat: p.lat,
+        lng: p.lng,
+        name: p.name || "",
+        comments: normalizeComments(p.comments),
+        seen: p.seen || false,
+      }));
       return new Response(JSON.stringify(points), {
         status: 200,
         headers: { "Content-Type": "application/json" },
@@ -18,14 +31,13 @@ export default async (req, context) => {
     // POST: create a new point
     if (method === "POST") {
       const body = await req.json();
-      const data = await store.get("data");
-      const points = data ? JSON.parse(data) : [];
+      const points = await loadPoints();
       const newPoint = {
         id: body.id,
         lat: body.lat,
         lng: body.lng,
         name: body.name || "",
-        comments: Array.isArray(body.comments) ? body.comments : [],
+        comments: normalizeComments(body.comments),
         seen: body.seen || false,
       };
       points.push(newPoint);
@@ -39,8 +51,7 @@ export default async (req, context) => {
     // PUT: update an existing point
     if (method === "PUT") {
       const body = await req.json();
-      const data = await store.get("data");
-      let points = data ? JSON.parse(data) : [];
+      const points = await loadPoints();
       const index = points.findIndex((p) => p.id === body.id);
       if (index === -1) {
         return new Response(JSON.stringify({ error: "Point not found" }), {
@@ -48,14 +59,17 @@ export default async (req, context) => {
           headers: { "Content-Type": "application/json" },
         });
       }
+
+      const existing = points[index];
       points[index] = {
         id: body.id,
-        lat: body.lat,
-        lng: body.lng,
-        name: body.name || "",
-        comments: Array.isArray(body.comments) ? body.comments : [],
-        seen: body.seen || false,
+        lat: body.lat ?? existing.lat,
+        lng: body.lng ?? existing.lng,
+        name: body.name ?? existing.name ?? "",
+        comments: normalizeComments(body.comments ?? existing.comments),
+        seen: body.seen ?? existing.seen ?? false,
       };
+
       await store.set("data", JSON.stringify(points));
       return new Response(JSON.stringify(points[index]), {
         status: 200,
@@ -66,24 +80,22 @@ export default async (req, context) => {
     // DELETE: remove a point
     if (method === "DELETE") {
       const body = await req.json();
-      const data = await store.get("data");
-      let points = data ? JSON.parse(data) : [];
+      const points = await loadPoints();
       const initialLength = points.length;
-      points = points.filter((p) => p.id !== body.id);
-      if (points.length === initialLength) {
+      const filtered = points.filter((p) => p.id !== body.id);
+      if (filtered.length === initialLength) {
         return new Response(JSON.stringify({ error: "Point not found" }), {
           status: 404,
           headers: { "Content-Type": "application/json" },
         });
       }
-      await store.set("data", JSON.stringify(points));
+      await store.set("data", JSON.stringify(filtered));
       return new Response(JSON.stringify({ success: true }), {
         status: 200,
         headers: { "Content-Type": "application/json" },
       });
     }
 
-    // Unsupported method
     return new Response(JSON.stringify({ error: "Method not allowed" }), {
       status: 405,
       headers: { "Content-Type": "application/json" },
