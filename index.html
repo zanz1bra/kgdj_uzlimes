@@ -141,6 +141,29 @@
       border:none;background:transparent;color:var(--ink);
       text-decoration:underline;cursor:pointer;font-size:12px;
     }
+
+    /* confirm dialog */
+    #confirm-overlay{
+      position:fixed;inset:0;background:rgba(0,0,0,0.6);
+      display:none;align-items:center;justify-content:center;
+      z-index:2000000;
+    }
+    #confirm-overlay.active{display:flex;}
+    #confirm-card{
+      background:var(--paper);border:2px solid var(--ink);
+      border-radius:12px;max-width:340px;width:90%;
+      padding:20px;text-align:center;
+    }
+    #confirm-card p{margin:0 0 16px;font-size:14px;font-weight:600;}
+    .confirm-btns{display:flex;gap:10px;justify-content:center;}
+    .btn-confirm-yes{
+      padding:8px 20px;border-radius:8px;border:none;cursor:pointer;
+      font-size:13px;font-weight:700;background:var(--red);color:var(--white);
+    }
+    .btn-confirm-no{
+      padding:8px 20px;border-radius:8px;border:2px solid var(--ink);cursor:pointer;
+      font-size:13px;font-weight:700;background:transparent;color:var(--ink);
+    }
   </style>
 </head>
 <body>
@@ -172,6 +195,16 @@
       <div id="point-list"></div>
       <div class="modal-close">
         <button onclick="closeList()">Aizvērt</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="confirm-overlay">
+    <div id="confirm-card">
+      <p>Vai tiešām dzēst šo punktu?</p>
+      <div class="confirm-btns">
+        <button class="btn-confirm-yes" id="confirm-yes">Dzēst</button>
+        <button class="btn-confirm-no" id="confirm-no">Atcelt</button>
       </div>
     </div>
   </div>
@@ -325,8 +358,8 @@
   }
 
   async function deletePoint(id){
-    const ok = window.confirm('Vai tiešām dzēst šo punktu?');
-    if(!ok) return;
+    const confirmed = await showConfirm();
+    if(!confirmed) return;
 
     const { error } = await supabase
       .from('points')
@@ -339,6 +372,22 @@
     }
 
     removePointFromUI(id);
+  }
+
+  function showConfirm(){
+    return new Promise(resolve => {
+      const overlay = document.getElementById('confirm-overlay');
+      overlay.classList.add('active');
+      function onYes(){ cleanup(); resolve(true); }
+      function onNo(){ cleanup(); resolve(false); }
+      function cleanup(){
+        overlay.classList.remove('active');
+        document.getElementById('confirm-yes').removeEventListener('click', onYes);
+        document.getElementById('confirm-no').removeEventListener('click', onNo);
+      }
+      document.getElementById('confirm-yes').addEventListener('click', onYes);
+      document.getElementById('confirm-no').addEventListener('click', onNo);
+    });
   }
 
   async function createPoint(latlng){
