@@ -42,12 +42,12 @@
       flex-wrap:wrap;
     }
     .brand{display:flex;align-items:center;gap:10px;}
-    .brand-badge{
-      width:34px;height:34px;border-radius:50%;
-      background:var(--red);border:2px solid var(--paper);
+    .brand-logo{
+      width:40px;height:40px;
       display:flex;align-items:center;justify-content:center;
-      font-family:Geneva, Verdana, sans-serif;font-size:11px;color:var(--ink);
-      letter-spacing:0.5px;
+    }
+    .brand-logo svg{
+      width:100%;height:100%;
     }
     .brand h1{
       font-family: Geneva, Verdana, sans-serif;font-weight:400;
@@ -114,7 +114,6 @@
     }
     .btn-save{background:var(--ink);color:var(--paper);}
     .btn-delete{background:transparent;color:var(--ink);text-decoration:underline;font-size:11px;}
-    .btn-seen-toggle{background:var(--purple);color:var(--white);}
 
     /* modal for list */
     .modal-overlay{
@@ -135,10 +134,6 @@
       font-size:13px;
     }
     .point-meta{font-size:11px;opacity:0.7;}
-    .chip-seen{
-      display:inline-block;padding:2px 8px;border-radius:999px;
-      background:var(--purple);color:var(--white);font-size:10px;margin-left:6px;
-    }
     .modal-close{
       margin-top:10px;font-size:12px;text-align:right;
     }
@@ -152,7 +147,9 @@
 <div id="app">
   <header>
     <div class="brand">
-      <div class="brand-badge">KGDJ</div>
+      <div class="brand-logo" id="logo-container">
+        <svg width="40" height="40" viewBox="0 0 210 297" xmlns="http://www.w3.org/2000/svg"><defs/><g id="layer1"><g id="g1" transform="matrix(0.3527772,0,0,0.3527772,0.03975364,-0.06849993)"><path d="M 344.5127,339.755 A 93.7499,93.7499 0 0 1 378.8276,467.8198 93.7499,93.7499 0 1 1 344.5127,339.755 Z" style="fill:#ffffff;fill-rule:evenodd;stroke:#1b1918;stroke-width:4.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none" id="path1"/><path d="M 340.4823,346.7358 A 85.6891,85.6891 0 0 1 371.8467,463.7893 85.6891,85.6891 0 1 1 340.4823,346.7358 Z" style="fill:none;stroke:#1b1918;stroke-width:2.9999;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none" id="path2"/><path d="M 337.176,352.4625 A 79.0766,79.0766 0 0 1 366.1201,460.4831 79.0766,79.0766 0 1 1 337.176,352.4625 Z" style="fill:none;stroke:#1b1918;stroke-width:2.2499;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none" id="path3"/><path d="M 334.2829,357.4736 A 73.2902,73.2902 0 0 1 361.109,457.5899 73.2902,73.2902 0 1 1 334.2829,357.4736 Z" style="fill:none;stroke:#1b1918;stroke-width:2.0001;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none" id="path4"/><path d="m 331.7484,361.8635 a 68.2212,68.2212 0 0 1 24.9707,93.1919 68.2212,68.2212 0 1 1 -24.9707,-93.1919 z" style="fill:#9933cc;fill-rule:evenodd;stroke:#1b1918;stroke-width:1.5001;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none" id="path5"/></g></g></svg>
+      </div>
       <div>
         <h1>Ko gan darītu Jēzus ar uzlīmēm?</h1>
         <div class="tagline">Nestu savu gaismu pasaulē!</div>
@@ -191,6 +188,14 @@
   let map;
   let markers = new Map();
   let addMode = false;
+
+  // Custom marker icon
+  const customIcon = L.icon({
+    iconUrl: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iNDUiIGZpbGw9IiNlMzAwMTYiIHN0cm9rZT0iIzFiMTkxOCIgc3Ryb2tlLXdpZHRoPSIzIi8+PGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iMzgiIGZpbGw9IiM5OTMzY2MiLz48L3N2Zz4=',
+    iconSize: [40, 40],
+    iconAnchor: [20, 40],
+    popupAnchor: [0, -40]
+  });
 
   // Wait for Supabase to load
   window.addEventListener('load', () => {
@@ -238,26 +243,20 @@
   function renderPoints(points){
     markers.clear();
     points.forEach(p => {
-      const marker = L.marker([p.lat, p.lng]).addTo(map);
+      const marker = L.marker([p.lat, p.lng], { icon: customIcon }).addTo(map);
       markers.set(p.id, marker);
       marker.bindPopup(popupHtml(p));
     });
   }
 
   function popupHtml(p){
-    const seenText = p.seen ? 'checked' : '';
     return `
       <div>
         <div class="pop-label">Nosaukums</div>
         <input class="pop-input" id="name-${p.id}" value="${p.name || ''}" placeholder="Uzlīmes vieta">
-        <div class="pop-label">Apraksts</div>
-        <input class="pop-input" id="note-${p.id}" value="${p.note || ''}" placeholder="Piem., kurā pilsētā, kad uzzīmēta">
-        <div class="pop-row">
-          <input type="checkbox" id="seen-${p.id}" ${seenText}>
-          <label for="seen-${p.id}">Redzēts dzīvē</label>
-        </div>
+        <div class="pop-label">Komentārs</div>
+        <input class="pop-input" id="note-${p.id}" value="${p.note || ''}" placeholder="Kad un kas to atrada?">
         <button class="btn-pop btn-save" onclick="savePoint('${p.id}')">Saglabāt</button>
-        <button class="btn-pop btn-seen-toggle" onclick="toggleSeen('${p.id}')">Pārslēgt "redzēts"</button>
         <button class="btn-pop btn-delete" onclick="deletePoint('${p.id}')">Dzēst punktu</button>
       </div>
     `;
@@ -266,36 +265,16 @@
   async function savePoint(id){
     const name = document.getElementById(`name-${id}`).value || '';
     const note = document.getElementById(`note-${id}`).value || '';
-    const seen = document.getElementById(`seen-${id}`).checked;
 
     const marker = markers.get(id);
     const {lat, lng} = marker.getLatLng();
 
     const { error } = await supabase
       .from('points')
-      .update({ lat, lng, name, note, seen })
+      .update({ lat, lng, name, note })
       .eq('id', id);
     
     if(error) console.error('Error updating point:', error);
-    await fetchPoints();
-  }
-
-  async function toggleSeen(id){
-    const marker = markers.get(id);
-    const {lat, lng} = marker.getLatLng();
-    const checkbox = document.getElementById(`seen-${id}`);
-    const seen = !checkbox.checked;
-    checkbox.checked = seen;
-
-    const name = document.getElementById(`name-${id}`).value || '';
-    const note = document.getElementById(`note-${id}`).value || '';
-
-    const { error } = await supabase
-      .from('points')
-      .update({ lat, lng, name, note, seen })
-      .eq('id', id);
-    
-    if(error) console.error('Error toggling seen:', error);
     await fetchPoints();
   }
 
@@ -349,7 +328,7 @@
         const div = document.createElement('div');
         div.className = 'point-item';
         div.innerHTML = `
-          <div><b>${p.name || 'Bez nosaukuma'}</b>${p.seen ? '<span class="chip-seen">Redzēts</span>' : ''}</div>
+          <div><b>${p.name || 'Bez nosaukuma'}</b></div>
           <div class="point-meta">${p.note || ''}</div>
         `;
         div.onclick = () => {
