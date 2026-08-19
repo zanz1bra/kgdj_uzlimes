@@ -237,27 +237,37 @@
     await fetchPoints();
   }
 
-  async function deletePoint(id){
-    const ok = window.confirm('Vai tiešām dzēst šo punktu?');
-    if(!ok) return;
+async function deletePoint(id){
+  const ok = window.confirm('Vai tiešām dzēst šo punktu?');
+  if(!ok) return;
 
-    const marker = markers.get(id);
-    if(marker){
-      marker.closePopup();
-      await new Promise(requestAnimationFrame);
-      map.removeLayer(marker);
-      markers.delete(id);
-    }
-    pointsCache = pointsCache.filter(p => p.id !== id);
-    if (document.getElementById('modal').style.display === 'flex') buildListFromCache();
-
-    const { error } = await supabase.from('points').delete().eq('id', id);
-    if(error) {
-      console.error('Error deleting point:', error);
-      await fetchPoints();
-      return;
-    }
+  // Remove from UI immediately
+  const marker = markers.get(id);
+  if(marker){
+    marker.closePopup();
+    map.removeLayer(marker);
+    markers.delete(id);
   }
+
+  pointsCache = pointsCache.filter(p => p.id !== id);
+
+  if (document.getElementById('modal').style.display === 'flex') {
+    buildListFromCache();
+  }
+
+  // Then delete from Supabase
+  const { error } = await supabase
+    .from('points')
+    .delete()
+    .eq('id', id);
+
+  if(error) {
+    console.error('Error deleting point:', error);
+    // If the database delete fails, refresh from server so UI matches reality
+    await fetchPoints();
+    return;
+  }
+}
 
   async function createPoint(latlng){
     const id = crypto.randomUUID();
