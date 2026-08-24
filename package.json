@@ -1,7 +1,8 @@
 {
   "type": "module",
   "dependencies": {
-    "node-fetch": "^3.3.2",
-    "formdata-polyfill": "^4.0.10"
+    "@supabase/supabase-js": "^2.112.3",
+    "formdata-polyfill": "^4.0.10",
+    "node-fetch": "^3.3.2"
   }
 }
