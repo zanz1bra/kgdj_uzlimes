@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Uzlīmju Jēzus</string>
+
+    <!--
+      Set this to the URL where the KGDJ Uzlīmes site is deployed
+      (e.g. your Netlify site, such as "https://kgdj-uzlimes.netlify.app/").
+      The app uploads/loads photos through "/.netlify/functions/*", so this
+      MUST point at the deployed Netlify site, not a local file path.
+    -->
+    <string name="app_url" translatable="false">https://REPLACE-WITH-YOUR-NETLIFY-SITE.netlify.app/</string>
+</resources>
