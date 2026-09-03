@@ -1,3 +1,15 @@
 # Local Netlify folder
 .netlify
 .env
+
+# Android build artifacts (android/ Gradle project)
+android/local.properties
+android/.gradle/
+android/.idea/
+android/build/
+android/app/build/
+android/*.iml
+android/app/*.iml
+android/gradle/wrapper/gradle-wrapper.jar
+android/captures/
+android/.cxx/
