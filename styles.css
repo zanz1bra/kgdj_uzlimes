@@ -114,14 +114,27 @@
       position:fixed;inset:0;background:rgba(0,0,0,0.6);
       display:none;align-items:center;justify-content:center;
       z-index:1000000;
+      padding:16px;
     }
     .modal-card{
       background:var(--paper);border:2px solid var(--ink);
-      border-radius:12px;max-width:420px;width:90%;
+      border-radius:12px;max-width:420px;width:min(90%,420px);
+      max-height:80vh;
       padding:16px;
+      display:flex;
+      flex-direction:column;
+      overflow:hidden;
+      position:relative;
     }
     .modal-card h2{
       margin:0 0 8px;font-family:'Anton',sans-serif;font-size:18px;
+      padding-right:36px;
+    }
+    #point-list{
+      overflow-y:auto;
+      min-height:0;
+      padding-right:4px;
+      flex:1;
     }
     .point-item{
       padding:8px 0;border-bottom:1px solid rgba(0,0,0,0.1);
@@ -130,9 +143,18 @@
     }
     .point-meta{font-size:11px;opacity:0.7;}
     .modal-close{
-      margin-top:10px;font-size:12px;text-align:right;
+      position:absolute;
+      top:10px;
+      right:10px;
+      margin-top:0;
+      font-size:12px;
+      text-align:right;
     }
     .modal-close button{
       border:none;background:transparent;color:var(--ink);
-      text-decoration:underline;cursor:pointer;font-size:12px;
+      cursor:pointer;font-size:20px;line-height:1;
+      width:32px;height:32px;border-radius:50%;
+    }
+    .modal-close button:hover{
+      background:rgba(0,0,0,0.08);
     }
