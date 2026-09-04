@@ -111,14 +111,21 @@
     .btn-delete{background:transparent;color:var(--ink);text-decoration:underline;font-size:11px;}
 
     .modal-overlay{
-      position:fixed;inset:0;background:rgba(0,0,0,0.6);
-      display:none;align-items:center;justify-content:center;
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,0.6);
+      display:none;
+      align-items:center;
+      justify-content:center;
       z-index:1000000;
       padding:16px;
     }
     .modal-card{
-      background:var(--paper);border:2px solid var(--ink);
-      border-radius:12px;max-width:420px;width:min(90%,420px);
+      background:var(--paper);
+      border:2px solid var(--ink);
+      border-radius:12px;
+      max-width:420px;
+      width:min(90%,420px);
       max-height:80vh;
       padding:16px;
       display:flex;
@@ -127,8 +134,10 @@
       position:relative;
     }
     .modal-card h2{
-      margin:0 0 8px;font-family:'Anton',sans-serif;font-size:18px;
+      margin:0 0 8px;
       padding-right:36px;
+      font-family:'Anton',sans-serif;
+      font-size:18px;
     }
     #point-list{
       overflow-y:auto;
@@ -137,7 +146,8 @@
       flex:1;
     }
     .point-item{
-      padding:8px 0;border-bottom:1px solid rgba(0,0,0,0.1);
+      padding:8px 0;
+      border-bottom:1px solid rgba(0,0,0,0.1);
       font-size:13px;
       cursor:pointer;
     }
@@ -151,9 +161,15 @@
       text-align:right;
     }
     .modal-close button{
-      border:none;background:transparent;color:var(--ink);
-      cursor:pointer;font-size:20px;line-height:1;
-      width:32px;height:32px;border-radius:50%;
+      border:none;
+      background:transparent;
+      color:var(--ink);
+      cursor:pointer;
+      font-size:20px;
+      line-height:1;
+      width:32px;
+      height:32px;
+      border-radius:50%;
     }
     .modal-close button:hover{
       background:rgba(0,0,0,0.08);
