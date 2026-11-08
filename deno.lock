@@ -11,6 +11,7 @@
   "workspace": {
     "packageJson": {
       "dependencies": [
+        "npm:@supabase/supabase-js@^2.112.3",
         "npm:formdata-polyfill@^4.0.10",
         "npm:node-fetch@^3.3.2"
       ]

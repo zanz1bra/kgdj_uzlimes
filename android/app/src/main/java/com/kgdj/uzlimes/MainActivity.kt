@@ -15,7 +15,6 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 
 /**
  * Thin native wrapper around the KGDJ Uzlīmes web app (see [R.string.app_url]).
@@ -28,7 +27,6 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 class MainActivity : AppCompatActivity() {
 
     private lateinit var webView: WebView
-    private lateinit var swipeRefresh: SwipeRefreshLayout
     private var filePathCallback: ValueCallback<Array<Uri>>? = null
 
     private val fileChooserLauncher =
@@ -56,7 +54,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         webView = findViewById(R.id.webView)
-        swipeRefresh = findViewById(R.id.swipeRefresh)
 
         webView.settings.apply {
             javaScriptEnabled = true
@@ -66,12 +63,7 @@ class MainActivity : AppCompatActivity() {
             mediaPlaybackRequiresUserGesture = false
         }
 
-        webView.webViewClient = object : WebViewClient() {
-            override fun onPageFinished(view: WebView?, url: String?) {
-                super.onPageFinished(view, url)
-                swipeRefresh.isRefreshing = false
-            }
-        }
+        webView.webViewClient = object : WebViewClient() {}
 
         webView.webChromeClient = object : WebChromeClient() {
             override fun onJsAlert(
@@ -131,8 +123,6 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-
-        swipeRefresh.setOnRefreshListener { webView.reload() }
 
         if (savedInstanceState != null) {
             webView.restoreState(savedInstanceState)
